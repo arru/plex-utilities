@@ -1,4 +1,5 @@
 import ImportUtils
+import plexapi.playlist
 
 CONFIGURATION = ImportUtils.get_configuration()
 
@@ -9,6 +10,9 @@ plex_tracks = plex.get_tracks_dict()
 itunes = ImportUtils.ItunesWrapper(CONFIGURATION)
 
 itunesPlaylists=itunes.library.getPlaylistNames()
+
+nonempty_playlists_counter = 0
+not_found_set = set()
 
 for playlist in itunesPlaylists:
     playlist_content = itunes.library.getPlaylist(playlist)
@@ -34,6 +38,12 @@ for playlist in itunesPlaylists:
                 playlist_items.append (plex_tracks[track_path])
             else:
                 not_found_set.add(track_path)
-                assert not 'Varpan' in track_path
+
         if len(playlist_items) > 0:
-            plex.api.playlist.Playlist.create(plex, playlist_content.name, items=playlist_items, MUSIC_SECTION)
+            plexapi.playlist.Playlist.create(plex.api, playlist_content.name, items=playlist_items, section=MUSIC_SECTION)
+
+            print ("%s\t(%d)\timported" % (playlist_content.name, len(playlist_items)))
+
+            nonempty_playlists_counter += 1
+
+print ("Tracks not found: %d" % len(not_found_set))
