@@ -11,6 +11,8 @@ itunes = ImportUtils.ItunesWrapper(CONFIGURATION)
 
 itunesPlaylists=itunes.library.getPlaylistNames()
 
+print("[INFO] Getting ready to import %d iTunes playlists" % len(itunesPlaylists))
+
 nonempty_playlists_counter = 0
 not_found_set = set()
 
