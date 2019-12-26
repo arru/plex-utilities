@@ -32,7 +32,7 @@ class FakePlexTrack:
         self.viewCount = plex_track.viewCount
 
 plex = ImportUtils.PlexWrapper(CONFIGURATION)
-PLEX_TRACKS = plex.api.library.section('Music').searchTracks()
+PLEX_TRACKS = plex.server.library.section('Music').searchTracks()
 
 itunes = ImportUtils.ItunesWrapper(CONFIGURATION)
 itunes_tracks = itunes.get_tracks_dict()

@@ -4,7 +4,7 @@ import plexapi.playlist
 CONFIGURATION = ImportUtils.get_configuration()
 
 plex = ImportUtils.PlexWrapper(CONFIGURATION)
-MUSIC_SECTION = plex.api.library.section('Music')
+MUSIC_SECTION = plex.server.library.section('Music')
 plex_tracks = plex.get_tracks_dict()
 
 itunes = ImportUtils.ItunesWrapper(CONFIGURATION)
@@ -42,7 +42,7 @@ for playlist in itunesPlaylists:
                 not_found_set.add(track_path)
 
         if len(playlist_items) > 0:
-            plexapi.playlist.Playlist.create(plex.api, playlist_content.name, items=playlist_items, section=MUSIC_SECTION)
+            plexapi.playlist.Playlist.create(plex.server, playlist_content.name, items=playlist_items, section=MUSIC_SECTION)
 
             print ("%s\t(%d)\timported" % (playlist_content.name, len(playlist_items)))
 

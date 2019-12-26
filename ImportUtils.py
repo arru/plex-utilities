@@ -20,7 +20,7 @@ def get_configuration():
     return configuration
 
 class PlexWrapper():
-    api = None
+    server = None
 
     def __init__(self, configuration):
         plexUrl = configuration.get('Plex', 'plexUrl')
@@ -29,12 +29,12 @@ class PlexWrapper():
 
         print("[INFO] Connecting to Plex server...")
         account = MyPlexAccount(token=plexToken)
-        self.api = account.resource(plexName).connect()
+        self.server = account.resource(plexName).connect()
 
     def get_tracks_dict(self):
         """Return all Plex tracks in a dictionary keyed on file path."""
 
-        music = self.api.library.section('Music')
+        music = self.server.library.section('Music')
 
         print("[INFO] Loading Plex music library in memory. This may take a while...")
         plexLibrary = music.searchTracks()
