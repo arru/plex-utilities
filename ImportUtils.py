@@ -25,9 +25,6 @@ class PlexWrapper():
         plexUrl = configuration.get('Plex', 'plexUrl')
         plexName = configuration.get('Plex', 'plexName')
         plexToken = configuration.get('Plex', 'plexToken')
-        # plexAccount = configuration.get('Plex', 'plexAccount')
-        #plexPassword = configuration.get('Plex', 'plexPassword')
-        #plexIdentifier = configuration.get('Plex', 'plexIdentifier')
 
         print("[INFO] Connecting to Plex server...")
         account = MyPlexAccount(token=plexToken)
