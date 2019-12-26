@@ -1,7 +1,8 @@
 from datetime import datetime
 import time
 from configparser import ConfigParser
-from os import path
+import os.path
+import unicodedata
 
 from plexapi.myplex import MyPlexAccount
 from libpytunes import Library
@@ -44,7 +45,8 @@ class PlexWrapper():
         plexTracks = {}
 
         for track in plexLibrary:
-            plexTracks[track.media[0].parts[0].file] = track
+            path = normalizeTrackPath(track.media[0].parts[0].file)
+            plexTracks[path] = track
 
         #del plexLibrary
 
@@ -67,9 +69,9 @@ class ItunesWrapper():
 
         # Sort itunes songs into dictionary by file path
         for _, song in self.library.songs.items():
-            if song.location and song.location.startswith('Volumes/'):
-                posixPath = "/%s" % song.location
-                itunesSongs[posixPath] = song
+            if is_song_on_disk(song):
+                path = normalizeTrackPath(song.location)
+                itunesSongs[path] = song
 
         #del itunesLibrary
 
@@ -77,6 +79,15 @@ class ItunesWrapper():
 
         return itunesSongs
 
+def normalizeTrackPath(path):
+    if path.startswith('Volumes/'):
+        path = '/' + path
+    return unicodedata.normalize('NFC', os.path.normpath(path))
+
+def is_song_on_disk(song):
+    if not song.location:
+        return False
+    return song.location.startswith('Volumes/')
 
 def timeTupToDatetime(timetup):
     datetime_output =  datetime(*timetup[:6])
