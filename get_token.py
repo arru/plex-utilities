@@ -8,17 +8,14 @@ from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 import json
 
-from configparser import ConfigParser
+import ImportUtils
 
-
-configuration = ConfigParser()
-configuration.read("itunes_plex.cfg")
+configuration = ImportUtils.get_configuration()
 
 loginURL = 'https://plex.tv/users/sign_in.json'
 plexAccount = configuration.get('Plex', 'plexAccount')
 
 PASSWORD = input("Password for Plex account %s:\n" % plexAccount)
-
 
 #we need to base 64 encode it
 #and then decode it to acsii as python 3 stores it as a byte string
@@ -32,7 +29,7 @@ POST_FIELDS = {
 'user[login]': plexAccount,
 'user[password]': PASSWORD}
 
-request = Request(loginURL), data=urlencode(POST_FIELDS).encode(), headers=HEADERS, method='POST')
+request = Request(loginURL, data=urlencode(POST_FIELDS).encode(), headers=HEADERS, method='POST')
 #(url, data=None, headers={}, origin_req_host=None, unverifiable=False, method=None)
 
 print("plexToken: %s" % json.loads(urlopen(request).read())['user']['authToken'])
