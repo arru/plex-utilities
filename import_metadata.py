@@ -82,4 +82,5 @@ for plex_track_real in PLEX_TRACKS:
 
     ImportUtils.validatePlexTrack(plex_track)
 
-print ("libraryMisses=%d" % libraryMisses)
+if libraryMisses > 0:
+    print ("[WARNING] %d Plex tracks not found in iTunes metadata" % libraryMisses)
