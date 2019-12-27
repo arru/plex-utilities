@@ -43,6 +43,7 @@ libraryMisses = 0
 
 for plex_track_real in PLEX_TRACKS:
     plex_path = plex_track_real.media[0].parts[0].file
+
     if not plex_path in itunes_tracks:
         # print("'%s' not found in itunes_tracks" % plex_path)
         libraryMisses += 1
@@ -71,7 +72,7 @@ for plex_track_real in PLEX_TRACKS:
         plex_track.index = itunesTrack.track_number
 
     # lastViewedAt (datetime) - Datetime item was last accessed.
-    if itunesTrack.lastplayed:
+    if itunesTrack.lastplayed and ImportUtils.timeTupToDatetime(itunesTrack.lastplayed) <= ImportUtils.CURRENT_DATE:
         plex_track.lastViewedAt = ImportUtils.timeTupToDatetime(itunesTrack.lastplayed)
 
     # title (str) - Artist, Album or Track title. (Jason Mraz, We Sing, Lucky, etc.)

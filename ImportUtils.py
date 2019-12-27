@@ -109,17 +109,12 @@ def validatePlexTrack(plex_track):
 
     assert plex_track.addedAt <= CURRENT_DATE
     assert plex_track.addedAt > OLDEST_DATE
-    # if plex_track.addedAt < OLDEST_DATE:
-    #     print("Your date is old: %s" % plex_track.addedAt)
 
     if plex_track.index:
         assert int(plex_track.index) >= 0
-        #assert int(plex_track.index) < 100
-        # if int(plex_track.index) > 100:
-        #     print ("Oddly large track number: %d" % plex_track.index)
 
     if plex_track.lastViewedAt is not None:
-        assert plex_track.lastViewedAt <= CURRENT_DATE
+        # assert plex_track.lastViewedAt <= CURRENT_DATE
         assert plex_track.lastViewedAt > OLDEST_DATE
 
     # title (str) - Artist, Album or Track title. (Jason Mraz, We Sing, Lucky, etc.)
