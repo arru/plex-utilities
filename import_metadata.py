@@ -53,35 +53,32 @@ for plex_track_real in PLEX_TRACKS:
 
     assert path.isfile(plex_path)
 
-    plex_track = FakePlexTrack(plex_track_real)
+    # plex_track = FakePlexTrack(plex_track_real)
+    plex_track = plex_track_real
 
     ImportUtils.validatePlexTrack(plex_track)
 
     if itunesTrack.rating:
+        plex_rating = float(itunesTrack.rating)/10.0
         # (float) - Rating of this track (0.0 - 10.0) equaling (0 stars - 5 stars)
-        plex_track.userRating = itunesTrack.rating/10.0
+        #.value
+        plex_track.edit(**{'userRating.value': plex_rating})
 
     # (int) - Year this track was released.
-    plex_track.year = itunesTrack.year
+    if itunesTrack.year:
+        plex_track.edit(**{'year.value': itunesTrack.year})
 
     # addedAt (datetime) - Datetime this item was added to the library.
-    plex_track.addedAt = ImportUtils.timeTupToDatetime(itunesTrack.date_added)
 
     # index (sting) - Index Number (often the track number).
     if itunesTrack.track_number:
-        plex_track.index = itunesTrack.track_number
+        plex_track.edit(**{'index.value': itunesTrack.track_number})
 
     # lastViewedAt (datetime) - Datetime item was last accessed.
-    if itunesTrack.lastplayed and ImportUtils.timeTupToDatetime(itunesTrack.lastplayed) <= ImportUtils.CURRENT_DATE:
-        plex_track.lastViewedAt = ImportUtils.timeTupToDatetime(itunesTrack.lastplayed)
-
     # title (str) - Artist, Album or Track title. (Jason Mraz, We Sing, Lucky, etc.)
     # originalTitle (str) - Track artist.
     # titleSort (str) - Title to use when sorting (defaults to title).
-
     # viewCount (int) - Count of times this item was accessed.
-    if itunesTrack.play_count:
-        plex_track.viewCount = itunesTrack.play_count
 
     ImportUtils.validatePlexTrack(plex_track)
 
