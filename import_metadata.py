@@ -57,7 +57,7 @@ for plex_track_real in PLEX_TRACKS:
 
     ImportUtils.validatePlexTrack(plex_track)
 
-    if plex_track.userRating:
+    if itunesTrack.rating:
         # (float) - Rating of this track (0.0 - 10.0) equaling (0 stars - 5 stars)
         plex_track.userRating = itunesTrack.rating/10.0
 
