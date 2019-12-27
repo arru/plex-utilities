@@ -104,9 +104,6 @@ def validatePlexTrack(plex_track):
         assert plex_track.year > OLDEST_TRACK_YEAR
         assert plex_track.year <= CURRENT_YEAR
 
-    assert plex_track.userRating >= 0.0
-    assert plex_track.userRating <= 10.0
-
     assert plex_track.addedAt <= CURRENT_DATE
     assert plex_track.addedAt > OLDEST_DATE
 
