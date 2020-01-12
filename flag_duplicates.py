@@ -1,6 +1,17 @@
 import ImportUtils
 import plexapi.playlist
 
+# Audio codecs in ascending order of preference
+CODEC_RATING = [
+'mp2',
+'mp3',
+'aac',
+'pcm',
+'wav',
+'aiff',
+'alac'
+]
+
 CONFIGURATION = ImportUtils.get_configuration()
 
 # Duration match tolerance in ms
@@ -37,11 +48,15 @@ duplicate_playlist_items = []
 for key, cluster in track_clusters.items():
     if len(cluster) > 1:
         highest_bitrate_value = 0
+        highest_bitrate_codec_index = 0
         highest_bitrate_track = None
         for track in cluster:
-            if track.media[0].bitrate > highest_bitrate_value:
+            codec = track.media[0].audioCodec.lower()
+            codec_index = CODEC_RATING.index(codec)
+            if codec_index > highest_bitrate_codec_index or (codec_index >= highest_bitrate_codec_index and track.media[0].bitrate > highest_bitrate_value):
                 highest_bitrate_value = track.media[0].bitrate
                 highest_bitrate_track = track
+                highest_bitrate_codec_index = codec_index
 
         lower_bitrate_duplicates = filter(lambda t: t is not highest_bitrate_track, cluster)
         duplicate_playlist_items.extend(lower_bitrate_duplicates)
