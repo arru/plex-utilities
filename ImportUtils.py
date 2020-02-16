@@ -23,7 +23,7 @@ class PlexWrapper():
     server = None
 
     def __init__(self, configuration):
-        plexUrl = configuration.get('Plex', 'plexUrl')
+        plexUrl = configuration.get('Plex', 'plexUrl', fallback='https://plex.tv')
         plexName = configuration.get('Plex', 'plexName')
         plexToken = configuration.get('Plex', 'plexToken')
 
