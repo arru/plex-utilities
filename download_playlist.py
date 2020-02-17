@@ -24,7 +24,7 @@ transcode_extension = "mp3"
 
 DOWNLOAD_TMP = '/tmp/plex_playlist_download/'
 
-CLEAN_FILE_CHARS_RE = re.compile(r'[^A-Za-z0-9\/\.]+')
+CLEAN_FILE_CHARS_RE = re.compile(r'[^A-Za-z0-9\/\. ]+')
 def clean_string(dirty_string):
     return CLEAN_FILE_CHARS_RE.sub('_', dirty_string).strip('_')
 
