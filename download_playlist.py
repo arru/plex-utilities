@@ -9,7 +9,7 @@ from datetime import datetime
 
 import ImportUtils
 
-#TODO: Library.recentlyAdded(100) / .onDeck() / .all()
+#TODO: Library.recentlyAdded(100) / .onDeck() / .all() / all tracks by artist
 
 #TODO:
 # destination config:
@@ -74,6 +74,9 @@ for download_playlist in download_playlists:
         assert len(track.media) == 1
         media = track.media[0]
         audio_format = (media.audioCodec, media.container)
+        #TODO: use original name and determine path before this step
+        # so that already DL'd tracks can be skipped
+        #TODO: download to common dir regardless of playlist
         download_paths = track.download(savepath=download_directory, keep_original_name=False)
         assert len(download_paths) == 1
         track_path = download_paths[0]
@@ -81,6 +84,7 @@ for download_playlist in download_playlists:
             transcode_input_files.append(track_path)
             
         downloaded_files.append(track_path)
+        #TODO: update ID3 tags from plex data
 
     assert len (downloaded_files) > 0
     assert len (transcode_input_files) <= len (downloaded_files)
@@ -91,7 +95,7 @@ for download_playlist in download_playlists:
 
     for dl_file in downloaded_files:
         if dl_file in transcode_input_files:
-            #TODO: acodec copy if only container differs
+            #TODO: acodec copy if only container differs (needs objects)
             filename = os.path.splitext(os.path.basename(dl_file))[0]
           
             ff_args = ["ffmpeg", "-i"]
@@ -112,3 +116,4 @@ for download_playlist in download_playlists:
 print ("Done! %d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
 
 shutil.rmtree(DOWNLOAD_TMP, ignore_errors=False)
+# TODO: don't erase these right away
