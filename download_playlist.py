@@ -100,6 +100,7 @@ for download_playlist in download_playlists:
           
             ff_args = ["ffmpeg", "-i"]
             ff_args.append(dl_file)
+            ff_args.append('-vn')
             ff_args.extend(["-c:a", transcode_codec])
             ff_args.extend(["-ac", "2"])
             ff_args.extend(["-q:a", str(transcode_quality)])
