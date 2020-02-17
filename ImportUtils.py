@@ -4,6 +4,7 @@ from configparser import ConfigParser
 import os.path
 import unicodedata
 
+from plexapi.server import PlexServer
 from plexapi.myplex import MyPlexAccount
 from libpytunes import Library
 
@@ -26,13 +27,21 @@ class PlexWrapper():
     server = None
 
     def __init__(self, configuration):
-        plexUrl = configuration.get('Plex', 'plexUrl', fallback='https://plex.tv')
+        plexUrl = configuration.get('Plex', 'plexUrl', fallback=None)
         plexName = configuration.get('Plex', 'plexName')
         plexToken = configuration.get('Plex', 'plexToken')
-
-        print("[INFO] Connecting to Plex server...")
-        account = MyPlexAccount(token=plexToken)
-        self.server = account.resource(plexName).connect()
+        
+        if plexUrl:
+            try:
+                print("[INFO] Connecting to local Plex server: %s" % plexUrl)
+                self.server = PlexServer(plexUrl, plexToken)
+            except:
+                print("[INFO] Local connection failed")
+                pass
+        if not self.server:
+            print("[INFO] Connecting through MyPlexAccount")
+            account = MyPlexAccount(token=plexToken)
+            self.server = account.resource(plexName).connect()
 
     def get_tracks_dict(self):
         """Return all Plex tracks in a dictionary keyed on file path."""
