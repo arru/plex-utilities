@@ -1,7 +1,7 @@
 import ImportUtils
 import plexapi.playlist
 
-# Audio codecs in ascending order of preference
+# Audio codecs in ascending order of preference (best goes last)
 CODEC_RATING = [
 'mp2',
 'mp3',
@@ -9,7 +9,8 @@ CODEC_RATING = [
 'pcm',
 'wav',
 'aiff',
-'alac'
+'alac',
+'flac'
 ]
 
 CONFIGURATION = ImportUtils.get_configuration()
