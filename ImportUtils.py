@@ -18,6 +18,9 @@ def get_configuration():
     configuration.read("itunes_plex.cfg")
 
     return configuration
+    
+def unmarshal_cfg_list(cfg_value):
+    return cfg_value.strip().split('\n')
 
 class PlexWrapper():
     server = None
