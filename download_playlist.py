@@ -11,13 +11,9 @@ import ImportUtils
 
 #TODO: Library.recentlyAdded(100) / .onDeck() / .all() / all tracks by artist
 
-#TODO:
-# destination config:
-# playlist name(s)
-# supported audio_formats (mime?)
-# conversion audio_format
-
 DOWNLOAD_TMP = '/tmp/plex_playlist_download/'
+
+PLAYLIST_FOLDER_RE = re.compile(r'(.*\|)?(.+)')
 
 CLEAN_FILE_CHARS_RE = re.compile(r'[^A-Za-z0-9\/\-\. ]+')
 def clean_string(dirty_string):
@@ -52,69 +48,78 @@ MUSIC_SECTION = plex.server.library.section('Music')
 
 download_playlists = []
 
+print ("Getting playlists from Plex server:")
 for download_playlist_name in download_playlist_names:
-    print ("Getting playlist '%s' from Plex server" % download_playlist_name)
+    print (download_playlist_name)
     #TODO: permissive playlist name matching?
     download_playlists.append(plex.server.playlist(download_playlist_name))
 
 assert len(download_playlists) == len(download_playlist_names)
+
+class TrackExportOp():
+    plex_track = None
+    transcode_codec = None
+    download_path = None
+    export_path = None
     
-for download_playlist in download_playlists:
-    playlist_items = download_playlist.items()
-
-    download_directory = os.path.join(DOWNLOAD_TMP, clean_string(download_playlist.title))
-    os.makedirs(download_directory, exist_ok=True)
-    
-    playlist_directory = os.path.join(export_directory, clean_string(download_playlist.title))
-
-    downloaded_files = []
-    transcode_input_files = []
-
-    for track in playlist_items:
-        assert len(track.media) == 1
-        media = track.media[0]
+    def __init__(self, plex_track):
+        self.plex_track = plex_track
+        assert len(self.plex_track.media) == 1
+        media = self.plex_track.media[0]
         audio_format = (media.audioCodec, media.container)
+        if audio_format not in SUPPORTED_FORMATS:
+            self.transcode_codec = transcode_codec
+            if media.audioCodec == self.transcode_codec:
+                self.transcode_codec = 'copy'
+        
+    def download(self):
         #TODO: use original name and determine path before this step
         # so that already DL'd tracks can be skipped
-        #TODO: download to common dir regardless of playlist
-        download_paths = track.download(savepath=download_directory, keep_original_name=False)
+        
+        download_paths = self.plex_track.download(savepath=DOWNLOAD_TMP, keep_original_name=False)
         assert len(download_paths) == 1
-        track_path = download_paths[0]
-        if not audio_format in SUPPORTED_FORMATS:
-            transcode_input_files.append(track_path)
-            
-        downloaded_files.append(track_path)
+        self.download_path = download_paths[0]
         #TODO: update ID3 tags from plex data
 
-    assert len (downloaded_files) > 0
-    assert len (transcode_input_files) <= len (downloaded_files)
-
-    print ("Copying files")
-    
-    os.makedirs(playlist_directory, exist_ok=True)
-
-    for dl_file in downloaded_files:
-        if dl_file in transcode_input_files:
-            #TODO: acodec copy if only container differs (needs objects)
-            filename = os.path.splitext(os.path.basename(dl_file))[0]
+    def export(self, playlist_directory):
+        if self.transcode_codec:
+            # TODO: don't encode if exists
+            filename = os.path.splitext(os.path.basename(self.download_path))[0]
           
             ff_args = ["ffmpeg", "-i"]
-            ff_args.append(dl_file)
+            ff_args.append(self.download_path)
             ff_args.append('-vn')
-            ff_args.extend(["-c:a", transcode_codec])
+            ff_args.extend(["-c:a", self.transcode_codec])
             ff_args.extend(["-ac", "2"])
             ff_args.extend(["-q:a", str(transcode_quality)])
-            #TODO: supply acodec arg as well
             ff_args.append(clean_string(os.path.join(playlist_directory, "%s.%s" % (filename, transcode_extension))))
-            assert subprocess.run(ff_args)
+            subprocess.run(ff_args)
         else:
-            basename = os.path.basename(dl_file)
-            export_path = clean_string(os.path.join(playlist_directory, basename))
             # TODO: don't copy if exists
+            basename = os.path.basename(self.download_path)
+            self.export_path = clean_string(os.path.join(playlist_directory, basename))
             # print ("copy %s %s" % (dl_file, export_path))
-            assert shutil.copy(dl_file, export_path)
+            assert shutil.copy(self.download_path, self.export_path)
+            
+    def __str__(self):
+        return ("%s\t/\t%s" % (self.plex_track.title, self.plex_track.grandparentTitle))
 
-print ("Done! %d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
+os.makedirs(DOWNLOAD_TMP, exist_ok=True)
 
-shutil.rmtree(DOWNLOAD_TMP, ignore_errors=False)
-# TODO: don't erase these right away
+for download_playlist in download_playlists:
+    stripped_title = PLAYLIST_FOLDER_RE.match(download_playlist.title).group(2)
+    assert stripped_title
+    playlist_directory = os.path.join(export_directory, clean_string(stripped_title))
+    os.makedirs(playlist_directory, exist_ok=True)
+
+    playlist_items = download_playlist.items()
+    
+    print ("Exporting %s" % download_playlist.title)
+    for item in playlist_items:
+        track_op = TrackExportOp(item)
+        track_op.download()
+        track_op.export(playlist_directory)
+        
+        print ("**** Exported track %s" % str(track_op))
+
+print("All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
