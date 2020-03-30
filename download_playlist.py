@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import re
 import os.path
+import os
 
 from configparser import ConfigParser
 from datetime import datetime
@@ -77,7 +78,7 @@ class TrackExportOp():
         media = self.plex_track.media[0]
         audio_format = (media.audioCodec, media.parts[0].container)
         self.download_container = media.container
-        assert download_container
+        assert self.download_container
         if audio_format not in SUPPORTED_FORMATS:
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
@@ -96,23 +97,30 @@ class TrackExportOp():
 
     def export(self, playlist_directory):
         if self.transcode_codec:
-            # TODO: don't encode if exists
-            filename = os.path.splitext(os.path.basename(self.download_path))[0]
-          
-            ff_args = ["ffmpeg", "-i"]
-            ff_args.append(self.download_path)
-            ff_args.append('-vn')
-            ff_args.extend(["-c:a", self.transcode_codec])
-            ff_args.extend(["-ac", "2"])
-            ff_args.extend(["-q:a", str(transcode_quality)])
-            ff_args.append(clean_string(os.path.join(playlist_directory, "%s.%s" % (filename, transcode_extension))))
-            subprocess.run(ff_args)
+            input_name = os.path.splitext(os.path.basename(self.download_path))[0]
+            transcode_name = clean_string("%s.%s" % (input_name, transcode_extension))
+            transcode_path = os.path.join(DOWNLOAD_TMP, transcode_name)
+            self.export_path = os.path.join(playlist_directory, transcode_name)
+            
+            if not os.path.isfile(self.export_path):
+                if not os.path.isfile(transcode_path):
+                    ff_args = ["ffmpeg", "-i"]
+                    ff_args.append(self.download_path)
+                    ff_args.append('-vn')
+                    ff_args.extend(["-c:a", self.transcode_codec])
+                    ff_args.extend(["-ac", "2"])
+                    ff_args.extend(["-q:a", str(transcode_quality)])
+                    ff_args.append(transcode_path)
+                    
+                    subprocess.run(ff_args)
+                    
+                assert shutil.copy(transcode_path, self.export_path)
+
         else:
-            # TODO: don't copy if exists
             basename = os.path.basename(self.download_path)
             self.export_path = clean_string(os.path.join(playlist_directory, basename))
-            # print ("copy %s %s" % (dl_file, export_path))
-            assert shutil.copy(self.download_path, self.export_path)
+            if not os.path.isfile(self.export_path):
+                assert shutil.copy(self.download_path, self.export_path)
             
     def __str__(self):
         return ("%s\t/\t%s" % (self.plex_track.title, self.plex_track.grandparentTitle))
