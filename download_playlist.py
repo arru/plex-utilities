@@ -62,7 +62,8 @@ class TrackExportOp():
     transcode_codec = None
     download_path = None
     download_container = None
-    export_path = None
+    
+    export_name = None
     title = None
     artist = ""
     album = ""
@@ -73,6 +74,7 @@ class TrackExportOp():
         self.title = self.plex_track.title
         self.artist = self.plex_track.artist()
         self.album = self.plex_track.album()
+        assert self.title
         
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
@@ -83,6 +85,18 @@ class TrackExportOp():
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
                 self.transcode_codec = 'copy'
+                
+        self.export_name = clean_string(self.title)
+        
+        self.export_name += " - %s" % clean_string(self.artist)
+        self.export_name += " (%s)" % clean_string(self.album)
+                
+        self.export_name += "."
+                    
+        if self.transcode_codec:
+            self.export_name += transcode_extension
+        else:
+            self.export_name += self.download_container
         
     def download(self):
         download_name = clean_string("%s_%s_%s.%s" % (self.title, self.artist, self.album, self.download_container))
@@ -95,7 +109,12 @@ class TrackExportOp():
              
         #TODO: update ID3 tags from plex data
 
+    def export_path(self, playlist_directory):
+        return os.path.join(playlist_directory, self.export_name)
+        
     def export(self, playlist_directory):
+        export_path = self.export_path(playlist_directory)
+        
         if self.transcode_codec:
             input_name = os.path.splitext(os.path.basename(self.download_path))[0]
             transcode_name = clean_string("%s.%s" % (input_name, transcode_extension))
@@ -138,8 +157,10 @@ for download_playlist in download_playlists:
     print ("Exporting %s" % download_playlist.title)
     for item in playlist_items:
         track_op = TrackExportOp(item)
-        track_op.download()
-        track_op.export(playlist_directory)
+        
+        if not os.path.isfile(track_op.export_path(playlist_directory)):
+            track_op.download()
+            track_op.export(playlist_directory)
         
         print ("**** Exported track %s" % str(track_op))
 
