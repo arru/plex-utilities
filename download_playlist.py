@@ -66,7 +66,7 @@ class TrackExportOp():
         self.plex_track = plex_track
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
-        audio_format = (media.audioCodec, media.container)
+        audio_format = (media.audioCodec, media.parts[0].container)
         if audio_format not in SUPPORTED_FORMATS:
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
