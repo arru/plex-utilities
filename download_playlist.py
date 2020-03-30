@@ -60,25 +60,38 @@ class TrackExportOp():
     plex_track = None
     transcode_codec = None
     download_path = None
+    download_container = None
     export_path = None
+    title = None
+    artist = ""
+    album = ""
     
     def __init__(self, plex_track):
         self.plex_track = plex_track
+        
+        self.title = self.plex_track.title
+        self.artist = self.plex_track.artist()
+        self.album = self.plex_track.album()
+        
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
         audio_format = (media.audioCodec, media.parts[0].container)
+        self.download_container = media.container
+        assert download_container
         if audio_format not in SUPPORTED_FORMATS:
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
                 self.transcode_codec = 'copy'
         
     def download(self):
-        #TODO: use original name and determine path before this step
-        # so that already DL'd tracks can be skipped
-        
-        download_paths = self.plex_track.download(savepath=DOWNLOAD_TMP, keep_original_name=False)
-        assert len(download_paths) == 1
-        self.download_path = download_paths[0]
+        download_name = clean_string("%s_%s_%s.%s" % (self.title, self.artist, self.album, self.download_container))
+        self.download_path = os.path.join(DOWNLOAD_TMP, download_name)
+        if not os.path.isfile(self.download_path):
+            download_paths = self.plex_track.download(savepath=DOWNLOAD_TMP, keep_original_name=False)
+            assert len(download_paths) == 1
+            
+            os.rename(download_paths[0], self.download_path)
+             
         #TODO: update ID3 tags from plex data
 
     def export(self, playlist_directory):
