@@ -120,15 +120,14 @@ class TrackExportOp():
             os.rename(download_paths[0], self.download_path)
             
             if not self.transcode_codec:
-                self.__write_tags(self.download_path)
+                self.__write_tags(self.download_container, self.download_path)
              
-    def __write_tags(self, file):
-        if self.download_container == 'mp3':
+    def __write_tags(self, container, file):
+        if container == 'mp3':
             try:
                 tag_file = mutagen.id3.ID3(file)
             except mutagen.id3.ID3NoHeaderError:
                 tag_file = mutagen.id3.ID3()
-
             tag_file.add(mutagen.id3.TIT2(text=self.title))
             if self.album:
                 tag_file.add(mutagen.id3.TALB(text=self.album))
@@ -155,7 +154,7 @@ class TrackExportOp():
                 
                 subprocess.run(ff_args)
                 
-            self.__write_tags(transcode_path)
+            self.__write_tags(transcode_extension, transcode_path)
             assert shutil.copy(transcode_path, export_path)
 
         else:
