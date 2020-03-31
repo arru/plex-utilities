@@ -77,9 +77,9 @@ class TrackExportOp():
         self.album = self.plex_track.album()
         assert self.title
         
-        if self.plex_track.originalTitle not in UNKNOWN_ARTIST_TITLES:
+        if self.plex_track.originalTitle and self.plex_track.originalTitle.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.originalTitle
-        elif self.plex_track.artist().title not in UNKNOWN_ARTIST_TITLES:
+        elif self.plex_track.artist().title.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.artist().title
         
         assert len(self.plex_track.media) == 1

@@ -8,6 +8,10 @@ from plexapi.server import PlexServer
 from plexapi.myplex import MyPlexAccount
 from libpytunes import Library
 
+EMPTY_TRACK_TITLES = ['no title', 'untitled', 'unknown', '[unknown]', 'none', '']
+EMPTY_ALBUM_TITLES = ['unknown album', '[unknown album]'] + EMPTY_TRACK_TITLES
+EMPTY_ARTIST_NAMES = ['unknown artist'] + EMPTY_TRACK_TITLES
+
 CURRENT_DATE = datetime.now() # time.localtime()
 OLDEST_DATE = datetime(1996, 1 , 1) #time.localtime(820450800)
 

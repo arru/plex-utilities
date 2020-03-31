@@ -11,9 +11,6 @@ import ImportUtils
 
 CONFIGURATION = ImportUtils.get_configuration()
 
-EMPTY_TRACK_TITLES = ['no title', 'untitled', 'unknown', '[unknown]', '']
-EMPTY_ALBUM_TITLES = ['unknown album', '[unknown album]'] + EMPTY_TRACK_TITLES
-EMPTY_ARTIST_NAMES = ['unknown artist'] + EMPTY_TRACK_TITLES
 
 ARTIST_DASH_TITLE_RE = re.compile(r"^^([^\d\(\) ]{2,}[^-\(\)]+) - (.+)$")
 
@@ -98,11 +95,11 @@ for plex_track_real in PLEX_TRACKS:
 
     plex_track = plex_track_real
 
-    bad_title = plex_track.title.lower() in EMPTY_TRACK_TITLES
-    bad_album = plex_track.album() is None or plex_track.album().title.lower() in EMPTY_ALBUM_TITLES and itunes_track.album is not None
+    bad_title = plex_track.title.lower() in ImportUtils.EMPTY_TRACK_TITLES
+    bad_album = plex_track.album() is None or plex_track.album().title.lower() in ImportUtils.EMPTY_ALBUM_TITLES and itunes_track.album is not None
     bad_track_artist = plex_track.originalTitle is None
     various_album = plex_track.album() is not None and len(plex_track.album().tracks()) > 1 and plex_track.artist().title == 'Various'
-    bad_album_artist = plex_track.artist() is None or plex_track.artist().title.lower() in EMPTY_ARTIST_NAMES
+    bad_album_artist = plex_track.artist() is None or plex_track.artist().title.lower() in ImportUtils.EMPTY_ARTIST_NAMES
     artist_dash_title_match = ARTIST_DASH_TITLE_RE.match(itunes_track.name)
 
     album_issue_marker = "_"
