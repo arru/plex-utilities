@@ -67,16 +67,20 @@ class TrackExportOp():
     export_name = None
     
     title = None
-    artist = ""
     album = ""
+    artist = None
     
     def __init__(self, plex_track):
         self.plex_track = plex_track
         
         self.title = self.plex_track.title
-        self.artist = self.plex_track.artist()
         self.album = self.plex_track.album()
         assert self.title
+        
+        if self.plex_track.originalTitle not in UNKNOWN_ARTIST_TITLES:
+            self.artist = self.plex_track.originalTitle
+        elif self.plex_track.artist().title not in UNKNOWN_ARTIST_TITLES:
+            self.artist = self.plex_track.artist().title
         
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
@@ -92,8 +96,8 @@ class TrackExportOp():
                 
         self.export_name = clean_string(self.title)
         
-        self.export_name += " - %s" % clean_string(self.artist)
-        self.export_name += " (%s)" % clean_string(self.album)
+        if self.artist:
+            self.export_name += " - %s" % clean_string(self.artist)
                 
         self.export_name += "."
                     
