@@ -9,6 +9,7 @@ from configparser import ConfigParser
 from datetime import datetime
 
 import mutagen.mp3
+import mutagen.apev2
 
 import ImportUtils
 
@@ -134,6 +135,19 @@ class TrackExportOp():
             if self.artist:
                 tag_file.add(mutagen.id3.TPE1(text=self.artist))
             tag_file.save(file)
+        elif container == 'aac':
+            tag_file = mutagen.apev2.APEv2File(file)
+            tag_file.add_tags()
+        
+            # http://wiki.hydrogenaud.io/index.php?title=APE_key
+            tag_file.tags['Title'] = self.title
+            if self.album:
+                tag_file.tags['Album'] = self.album
+        
+            if self.artist:
+                tag_file.tags['Artist'] = self.artist
+        
+            tag_file.save()
 
     def export_path(self, playlist_directory):
         return os.path.join(playlist_directory, self.export_name)
