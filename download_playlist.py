@@ -158,7 +158,8 @@ for download_playlist in download_playlists:
         if not os.path.isfile(track_op.export_path(playlist_directory)):
             track_op.download()
             track_op.export(playlist_directory)
-        
-        print ("**** Exported track %s" % str(track_op))
+            print ("++++ Exported track %s" % str(track_op))
+        else:
+            print ("==== Skipped preexisting track %s" % str(track_op))
 
 print("All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
