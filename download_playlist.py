@@ -188,7 +188,7 @@ for download_playlist in download_playlists:
 
     playlist_items = download_playlist.items()
     
-    print ("Exporting %s" % download_playlist.title)
+    print ("**** Exporting %s" % download_playlist.title)
     for item in playlist_items:
         track_op = TrackExportOp(item)
         
@@ -199,4 +199,4 @@ for download_playlist in download_playlists:
         else:
             print ("==== Skipped preexisting track %s" % str(track_op))
 
-print("All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
+print("     All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
