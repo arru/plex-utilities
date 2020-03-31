@@ -8,6 +8,8 @@ import os
 from configparser import ConfigParser
 from datetime import datetime
 
+import mutagen.mp3
+
 import ImportUtils
 
 #TODO: Library.recentlyAdded(100) / .onDeck() / .all() / all tracks by artist
@@ -116,8 +118,23 @@ class TrackExportOp():
             assert len(download_paths) == 1
             
             os.rename(download_paths[0], self.download_path)
+            
+            if not self.transcode_codec:
+                self.__write_tags(self.download_path)
              
-        #TODO: update ID3 tags from plex data
+    def __write_tags(self, file):
+        if self.download_container == 'mp3':
+            try:
+                tag_file = mutagen.id3.ID3(file)
+            except mutagen.id3.ID3NoHeaderError:
+                tag_file = mutagen.id3.ID3()
+
+            tag_file.add(mutagen.id3.TIT2(text=self.title))
+            if self.album:
+                tag_file.add(mutagen.id3.TALB(text=self.album))
+            if self.artist:
+                tag_file.add(mutagen.id3.TPE1(text=self.artist))
+            tag_file.save(file)
 
     def export_path(self, playlist_directory):
         return os.path.join(playlist_directory, self.export_name)
@@ -138,6 +155,7 @@ class TrackExportOp():
                 
                 subprocess.run(ff_args)
                 
+            self.__write_tags(transcode_path)
             assert shutil.copy(transcode_path, export_path)
 
         else:
