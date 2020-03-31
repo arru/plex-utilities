@@ -67,20 +67,22 @@ class TrackExportOp():
     export_name = None
     
     title = None
-    album = ""
     artist = None
+    album = None
     
     def __init__(self, plex_track):
         self.plex_track = plex_track
         
         self.title = self.plex_track.title
-        self.album = self.plex_track.album()
         assert self.title
         
         if self.plex_track.originalTitle and self.plex_track.originalTitle.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.originalTitle
         elif self.plex_track.artist().title.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.artist().title
+
+        if self.plex_track.album().title.lower() not in ImportUtils.EMPTY_ALBUM_TITLES:
+            self.album = self.plex_track.album().title
         
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
