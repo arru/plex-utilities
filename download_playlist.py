@@ -4,7 +4,6 @@ import subprocess
 import re
 import os.path
 import os
-import hashlib
 
 from configparser import ConfigParser
 from datetime import datetime
@@ -74,10 +73,6 @@ class TrackExportOp():
     def __init__(self, plex_track):
         self.plex_track = plex_track
         
-        hashString = self.plex_track.title + str(self.plex_track.artist()) + str(self.plex_track.album()) + str(plex_track.media[0].duration)
-        print (hashString)
-        self.hash = hashlib.md5(hashString.encode()).hexdigest()
-
         self.title = self.plex_track.title
         self.artist = self.plex_track.artist()
         self.album = self.plex_track.album()
@@ -92,6 +87,8 @@ class TrackExportOp():
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
                 self.transcode_codec = 'copy'
+                
+        self.hash = media.id
                 
         self.export_name = clean_string(self.title)
         
