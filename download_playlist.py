@@ -33,7 +33,7 @@ DL_CONFIGURATION = ConfigParser()
 DL_CONFIGURATION.read(os.path.join(export_directory, "plex_download.cfg"))
 
 # https://trac.ffmpeg.org/wiki/Encode/MP3
-transcode_quality = DL_CONFIGURATION.get('Format', 'quality', fallback=1)
+transcode_quality = DL_CONFIGURATION.get('Format', 'quality', fallback=3)
 transcode_codec = DL_CONFIGURATION.get('Format', 'codec', fallback='mp3')
 transcode_extension = DL_CONFIGURATION.get('Format', 'container', fallback='mp3')
 
