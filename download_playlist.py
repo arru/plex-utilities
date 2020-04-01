@@ -17,6 +17,7 @@ import ImportUtils
 #TODO: Library.recentlyAdded(100) / .onDeck() / .all() / all tracks by artist
 
 DOWNLOAD_TMP = '/tmp/plex_playlist_download/'
+DELETE_REMOVED_TRACKS = True
 
 PLAYLIST_FOLDER_RE = re.compile(r'(.*\|)?(.+)')
 
@@ -61,6 +62,36 @@ for download_playlist_name in download_playlist_names:
 
 assert len(download_playlists) == len(download_playlist_names)
 
+class ExistingTrack():
+    name = None
+    dir_path = None
+    
+    @classmethod
+    def get_if_valid(_, full_path):
+        _, extension = os.path.splitext(full_path)
+        extension = extension[1:]
+        for _, sext in SUPPORTED_FORMATS:
+            if extension == sext:
+                return ExistingTrack(full_path)
+                
+        return None
+        
+    def __init__(self, full_path):
+        self.dir_path, self.name = os.path.split(full_path)
+        assert os.path.isfile(self.path())
+        
+    def path(self):
+        assert self.dir_path
+        assert self.name
+        
+        return os.path.join(self.dir_path, self.name)
+        
+    def delete(self):
+        assert DELETE_REMOVED_TRACKS
+        
+        os.remove(self.path())
+        
+        
 class TrackExportOp():
     plex_track = None
     transcode_codec = None
@@ -192,16 +223,34 @@ for download_playlist in download_playlists:
     os.makedirs(playlist_directory, exist_ok=True)
 
     playlist_items = download_playlist.items()
+    remaining_items = {}
+    
+    for (dirpath, dirnames, filenames) in os.walk(playlist_directory):
+        for file in filenames:
+            file_path = os.path.join(playlist_directory, file)
+            
+            existing_track = ExistingTrack.get_if_valid(file_path)
+            if existing_track:
+                remaining_items[unicodedata.normalize('NFD', existing_track.name)] = existing_track
+        break
     
     print ("**** Exporting %s" % download_playlist.title)
     for item in playlist_items:
         track_op = TrackExportOp(item)
         
-        if not os.path.isfile(track_op.export_path(playlist_directory)):
+        if not track_op.export_name in remaining_items.keys():
             track_op.download()
             track_op.export(playlist_directory)
+            
             print ("++++ Exported track %s" % str(track_op))
         else:
+            del(remaining_items[track_op.export_name])
             print ("==== Skipped preexisting track %s" % str(track_op))
+        
+    if DELETE_REMOVED_TRACKS:
+        assert len(playlist_items) > len(remaining_items)
+        for _, existing_track in remaining_items.items():
+            print ("xxxx Deleting removed %s" % existing_track.path())
+            existing_track.delete()
 
 print("     All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
