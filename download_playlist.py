@@ -4,6 +4,7 @@ import subprocess
 import re
 import os.path
 import os
+import unicodedata
 
 from configparser import ConfigParser
 from datetime import datetime
@@ -21,7 +22,7 @@ PLAYLIST_FOLDER_RE = re.compile(r'(.*\|)?(.+)')
 
 CLEAN_FILE_CHARS_RE = re.compile(r'[^A-Za-z0-9\/\-\. ]+')
 def clean_string(dirty_string):
-    return CLEAN_FILE_CHARS_RE.sub('_', dirty_string).strip('_')
+    return unicodedata.normalize('NFD', CLEAN_FILE_CHARS_RE.sub('_', dirty_string).strip('_'))
 
 
 export_directory = sys.argv[1]
