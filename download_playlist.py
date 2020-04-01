@@ -25,7 +25,7 @@ def clean_string(dirty_string):
     return unicodedata.normalize('NFD', CLEAN_FILE_CHARS_RE.sub('_', dirty_string).strip('_'))
 
 
-export_directory = sys.argv[1]
+export_directory = os.path.abspath(sys.argv[1])
 assert os.path.isdir(export_directory), "Output folder does not exist"
 
 DL_CONFIGURATION = ConfigParser()
