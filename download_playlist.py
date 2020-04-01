@@ -138,7 +138,11 @@ class TrackExportOp():
             tag_file.save(file)
         elif container == 'aac':
             tag_file = mutagen.apev2.APEv2File(file)
-            tag_file.add_tags()
+            try:
+                tag_file.add_tags()
+            except mutagen.apev2.error:
+                # error if file already has tags
+                pass
         
             # http://wiki.hydrogenaud.io/index.php?title=APE_key
             tag_file.tags['Title'] = self.title
