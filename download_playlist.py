@@ -7,7 +7,6 @@ import os
 import unicodedata
 
 from configparser import ConfigParser
-from datetime import datetime
 
 import mutagen.mp3
 import mutagen.apev2
@@ -261,15 +260,16 @@ for download_playlist in download_playlists:
             track_op.download()
             track_op.export(playlist_directory)
             
-            print ("++++ Exported track %s" % str(track_op))
+            print ("   + %s" % str(track_op))
         else:
+            # Preexisting track, skip
             del(remaining_items[track_op.export_name])
-            print ("==== Skipped preexisting track %s" % str(track_op))
         
     if DELETE_REMOVED_TRACKS:
+        print ("**** Deleting removed tracks")
         assert len(playlist_items) > len(remaining_items)
         for _, existing_track in remaining_items.items():
-            print ("xxxx Deleting removed %s" % existing_track.path())
+            print ("   - %s" % existing_track.path())
             existing_track.delete()
 
-print("     All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
+print("**** All done!")#%d tracks downloaded to %s (of which %d were transcoded to %s)" % (len(downloaded_files), export_directory, len(transcode_input_files), transcode_extension))
