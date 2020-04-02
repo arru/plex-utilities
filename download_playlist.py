@@ -11,6 +11,7 @@ from datetime import datetime
 
 import mutagen.mp3
 import mutagen.apev2
+import mutagen.mp4
 
 import ImportUtils
 
@@ -182,6 +183,24 @@ class TrackExportOp():
         
             if self.artist:
                 tag_file.tags['Artist'] = self.artist
+        
+            tag_file.save()
+            
+        elif container in ['mp4', 'm4a']:
+            tag_file = mutagen.mp4.MP4(file)
+            try:
+                tag_file.add_tags()
+            except mutagen.mp4.error:
+                # error if file already has tags
+                # print(tag_file.tags)
+                pass
+                
+            tag_file.tags['©nam'] = self.title
+            if self.album:
+                tag_file.tags['©alb'] = self.album
+        
+            if self.artist:
+                tag_file.tags['©ART'] = self.artist
         
             tag_file.save()
 
