@@ -31,7 +31,7 @@ for playlist in itunesPlaylists:
     else:
         playlist_items = []
         for track in playlist_content.tracks:
-            if not ImportUtils.is_song_on_disk(track):
+            if not ImportUtils.is_song_on_disk(track) or not '/iTunes Media/Music/' in track.location:
                 continue
 
             track_path = ImportUtils.normalizeTrackPath(track.location)
