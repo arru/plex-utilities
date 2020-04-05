@@ -108,8 +108,10 @@ class TrackExportOp():
     def __init__(self, plex_track):
         self.plex_track = plex_track
         
-        self.title = self.plex_track.title
-        assert self.title
+        if self.plex_track.title:
+            self.title = self.plex_track.title
+        else:
+            self.title = "Untitled %d" % self.plex_track.ratingKey
         
         if self.plex_track.originalTitle and self.plex_track.originalTitle.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.originalTitle
