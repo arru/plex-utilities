@@ -100,6 +100,7 @@ for plex_track_real in PLEX_TRACKS:
     bad_track_artist = plex_track.originalTitle is None
     various_album = plex_track.album() is not None and len(plex_track.album().tracks()) > 1 and plex_track.artist().title == 'Various'
     bad_album_artist = plex_track.artist() is None or plex_track.artist().title.lower() in ImportUtils.EMPTY_ARTIST_NAMES
+    #TODO: run dash filter on a curated "needs attention" playlist!
     artist_dash_title_match = ARTIST_DASH_TITLE_RE.match(itunes_track.name)
 
     album_issue_marker = "_"
@@ -180,12 +181,11 @@ for plex_track_real in PLEX_TRACKS:
     
     if update_title:
         plex_track.edit(**{'title.value': update_title[0]})
-        plex_track.edit(**{'title.value.locked': update_title[1]})
+        plex_track.edit(**{'title.locked': int(update_title[1])})
 
     if update_track_artist:
         plex_track.edit(**{'originalTitle.value': update_track_artist[0]})
-        plex_track.edit(**{'originalTitle.value.locked': update_track_artist[1]})
-    
+        plex_track.edit(**{'originalTitle.locked': int(update_track_artist[1])})
     if update_album_artist:
         print ("TODO update_album_artist")
     
