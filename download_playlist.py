@@ -76,10 +76,7 @@ class TrackExportList():
         return None
         
     def set_up_directory(self, export_base_directory_):
-        # TODO: move strip code to named playlist class
-        stripped_title = PLAYLIST_FOLDER_RE.match(str(self)).group(2)
-        assert stripped_title
-        self.directory = os.path.join(export_base_directory_, clean_string(stripped_title))
+        self.directory = os.path.join(export_base_directory_, clean_string(str(self)))
         os.makedirs(self.directory, exist_ok=True)
         
         return self.directory
@@ -178,7 +175,9 @@ class NamedPlayList(TrackExportList):
         self.items = self.playlist.items()
         
     def __str__(self):
-        return str(self.playlist.title)
+        #Remove "folder" part before | in title, if present
+        stripped_title = PLAYLIST_FOLDER_RE.match(self.playlist.title).group(2)
+        return str(stripped_title)
         
 
 export_tracklists = []
