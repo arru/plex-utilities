@@ -3,3 +3,7 @@ Reference
 *.pyc
 *.rsls
 itunes_plex.cfg
+download-test
+libpytunes*
+.pylintrc
+Profile
