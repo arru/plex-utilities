@@ -117,6 +117,7 @@ for plex_track_real in PLEX_TRACKS:
             album_issue_marker = "V"
             
         if bad_track_artist:
+            #TODO copy resolved thing here
             if itunes_track.artist:
                 update_track_artist = (str(itunes_track.artist).title(), True)
                 matched_artist = match_plex_artist(itunes_track.artist)
@@ -192,7 +193,7 @@ for plex_track_real in PLEX_TRACKS:
     if update_album_title:
         print ("TODO update_album_title")
 
-    if ((bad_title or artist_dash_title_match) and not update_title) or ((bad_track_artist or various_album) and not update_track_artist) or (bad_album_artist and not update_album_artist) or (bad_album and not update_album_title):
+    if ((bad_title or artist_dash_title_match) and not update_title) or (bad_track_artist and various_album and not update_track_artist) or (bad_album_artist and bad_track_artist):
         unknown_artist_playlist_items.append(plex_track)
 
 playlist_title = "Album, artist, title needs attention"
