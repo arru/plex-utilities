@@ -81,7 +81,11 @@ class ExistingTrack():
     def delete(self):
         assert DELETE_REMOVED_TRACKS
         
-        os.remove(self.path())
+        try:
+            os.remove(self.path())
+        except FileNotFoundError:
+            print ("     %s already removed)" % str(self.path()))
+
         
         
 class ExportDirectory(object):
