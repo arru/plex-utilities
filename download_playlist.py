@@ -95,7 +95,7 @@ class ExportDirectory(object):
     def __init__(self, path):
         os.makedirs(path, exist_ok=True)
 
-        for (dirpath, dirnames, filenames) in os.walk(path):
+        for (_, _, filenames) in os.walk(path):
             for file in filenames:
                 file_path = os.path.join(path, file)
                 
