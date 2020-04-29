@@ -187,12 +187,15 @@ class AlbumTrackList(TrackList):
         artist_name = query_match.group(2)
         artist = MUSIC_SECTION.search(title=artist_name, sort=None, maxresults=1, libtype='artist')[0]
         assert artist
-        for album in artist.albums():
+        
+        all_albums = artist.albums()
+        for album in all_albums:
             if album.title == album_title:
                 self.album = album
                 self.items = album.tracks()
                 break
                 
+        assert self.album
     def __str__(self):
         return str(self.album.title)
     
