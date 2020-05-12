@@ -117,7 +117,6 @@ class ExportDirectory(object):
         del(self.remaining_items[track_name])
             
     def delete_remaining(self):
-        print ("**** Deleting removed tracks")
         # assert len(export_tracklist.items) > len(remaining_items)
         for _, existing_track in self.remaining_items.items():
             print ("   - %s" % existing_track.path())
