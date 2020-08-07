@@ -173,25 +173,42 @@ class TracksFromYearTrackList(TrackList):
         
     def __str__(self):
         return str(self.year)
-        
+
 class AlbumTrackList(TrackList):
-    """Get all tracks from album by artist"""
-    invocation = re.compile(r'\/album\/(.+)\/(.+)')
-    
+    """Get all tracks from album, optionally by artist"""
+    invocation = re.compile(r'\/album\/(.+)')
+    album_artist_split = re.compile(r'^(.+?)(\/.+)?$')
+
     def __init__(self, query_match):
-        album_title = query_match.group(1)
-        artist_name = query_match.group(2)
-        artist = MUSIC_SECTION.search(title=artist_name, sort=None, maxresults=1, libtype='artist')[0]
-        assert artist
+        album_artist_query = query_match.group(1)
+        album_artist_match = self.album_artist_split.match(album_artist_query)
         
-        all_albums = artist.albums()
-        for album in all_albums:
-            if album.title == album_title:
-                self.album = album
-                self.items = album.tracks()
-                break
-                
+        album_title = album_artist_match.group(1)
+        artist_name = album_artist_match.group(2)
+        
+        if artist_name:
+            artist_name = artist_name[1:]
+            artist = MUSIC_SECTION.search(title=artist_name, sort=None, maxresults=1, libtype='artist')[0]
+            assert artist
+
+            self.album = None
+            all_albums = artist.albums()
+            for album in all_albums:
+                if album.title == album_title:
+                    self.album = album
+                    self.items = album.tracks()
+                    break
+
+            if not self.album:
+                print("%s:" % artist.title)
+                for candidate in all_albums:
+                    print("\t%s" % candidate.title)
+        else:
+            self.album = MUSIC_SECTION.search(title=album_title, sort=None, maxresults=1, libtype='album')[0]
+            self.items = self.album.tracks()
+
         assert self.album
+
     def __str__(self):
         return str(self.album.title)
     
