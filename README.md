@@ -111,3 +111,12 @@ Installation
 1.  run install.sh script
 1.  run get_token.py (see instructions above) to get your Plex login token, then paste it at the appropriate line in `itunes_plex.cfg`
 1.  if you're just starting with Plex and migrating from iTunes, start with the iTunes import scripts, then use playlist_sort.py if you wish (recommended)
+
+License
+-------
+These scripts are copyright © 2020 Arvid Rudling. Licensed under the 3-Clause BSD License, se LICENSE file
+
+Plex is a trademark of Plex, Inc. or its subsidiaries.
+All other trademarks are the property of their respective owners.
+
+The software is developed without any affiliation to the mentioned vendors.
