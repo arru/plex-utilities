@@ -315,7 +315,9 @@ class ExportTrack():
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
                 self.transcode_codec = 'copy'
-                
+        else:
+            self.transcode_codec = None
+
         self.hash = media.id
                 
         self.export_name = clean_string(self.title)
