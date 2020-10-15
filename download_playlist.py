@@ -297,15 +297,20 @@ class ExportTrack():
             self.artist = self.plex_track.originalTitle
         elif self.plex_track.artist().title.lower() not in ImportUtils.EMPTY_ARTIST_NAMES:
             self.artist = self.plex_track.artist().title
+        else:
+            self.artist = None
 
         if self.plex_track.album().title.lower() not in ImportUtils.EMPTY_ALBUM_TITLES:
             self.album = self.plex_track.album().title
-        
+        else:
+            self.album = None
+
         assert len(self.plex_track.media) == 1
         media = self.plex_track.media[0]
         audio_format = (media.audioCodec, media.parts[0].container)
         self.download_container = media.container
         assert self.download_container
+
         if audio_format not in SUPPORTED_FORMATS:
             self.transcode_codec = transcode_codec
             if media.audioCodec == self.transcode_codec:
