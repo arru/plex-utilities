@@ -1,4 +1,6 @@
-git clone https://github.com/liamks/libpytunes.git
-pip3 install plexapi
-pip3 install mutagen
-brew install ffmpeg
+set -e
+git clone https://github.com/liamks/libpytunes.git libpytunes-checkout
+ln -s libpytunes-checkout/libpytunes .
+pip3 install --user plexapi
+pip3 install --user mutagen
+brew install --user ffmpeg
